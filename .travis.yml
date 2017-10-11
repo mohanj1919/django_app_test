@@ -22,8 +22,8 @@ env:
     # Figure out git branch regardless of PR/normal build
     - PR=https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST
     - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
-    - AWS_ACCOUNT=$(if [ "$BRANCH" == "deidprod" ]; then echo 130860143866; elif [ "$BRANCH" == "deiddev" ]; then echo 687159894535; fi)
-    - DEVOPS_ENV=$(if [ "$BRANCH" == "deidprod" ]; then echo deidprod; elif [ "$BRANCH" == "deiddev" ]; then echo deiddev; fi)
+    - AWS_ACCOUNT=$(if [ "$BRANCH" == "master" ]; then echo 762653616445; elif [ "$BRANCH" == "deiddev" ]; then echo 762653616445; fi)
+    - DEVOPS_ENV=$(if [ "$BRANCH" == "master" ]; then echo master; elif [ "$BRANCH" == "deiddev" ]; then echo deiddev; fi)
     - COMPOSE_IMAGE=curation
     - DOCKER_AWS_ENV="-e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN -e AWS_SESSION_EXPIRATION"
     - DOCKER_AWS_ENV_DEPLOY_USER="-e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN -e AWS_SESSION_EXPIRATION=$AWS_SESSION_EXPIRATION"
@@ -93,7 +93,7 @@ after_deploy:
     # fail fast
     set -e
     # Only do push/deploy/clean if on a trigger branch
-    if [[ $BRANCH =~ deidprod|deiddev ]]; then
+    if [[ $BRANCH =~ master|deiddev ]]; then
       echo "Performing deploy for branch $BRANCH"
       eval $(docker run ${DOCKER_AWS_ENV_DEPLOY_USER} betteroutcomes/aws-ecs-deploy aws-assume-role $AWS_ACCOUNT ops-deployer)
 
@@ -104,7 +104,7 @@ after_deploy:
       # The ID world and the DEID world handle their use of the schema repository differently.  In the DEID world
       # schema is a task that migrates the stdstore.  In the ID world, schema is a service that provides an API.
 
-      if [[ $BRANCH =~ deidprod|deiddev ]]; then
+      if [[ $BRANCH =~ master|deiddev ]]; then
           # Update the ECS service
           docker run ${DOCKER_AWS_ENV} betteroutcomes/aws-ecs-deploy aws-ecs-deploy ${ECS_CLUSTER} ${ECS_SERVICE} $ECS_IMAGE:${REV}
       fi

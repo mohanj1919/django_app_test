@@ -23,7 +23,7 @@ env:
     - PR=https://api.github.com/repos/$TRAVIS_REPO_SLUG/pulls/$TRAVIS_PULL_REQUEST
     - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
     - AWS_ACCOUNT=$(if [ "$BRANCH" == "master" ]; then echo 762653616445; elif [ "$BRANCH" == "deiddev" ]; then echo 762653616445; fi)
-    - DEVOPS_ENV=$(if [ "$BRANCH" == "master" ]; then echo master; elif [ "$BRANCH" == "deiddev" ]; then echo deiddev; fi)
+    - DEVOPS_ENV=$(if [ "$BRANCH" == "master" ]; then echo test; elif [ "$BRANCH" == "deiddev" ]; then echo test; fi)
     - COMPOSE_IMAGE=curation
     - DOCKER_AWS_ENV="-e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN -e AWS_SESSION_EXPIRATION"
     - DOCKER_AWS_ENV_DEPLOY_USER="-e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN -e AWS_SESSION_EXPIRATION=$AWS_SESSION_EXPIRATION"

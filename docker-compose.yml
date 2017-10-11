@@ -1,0 +1,44 @@
+version: '2'
+
+volumes:
+  postgres_data: {}
+  postgres_backup: {}
+
+services:
+  postgres:
+    container_name: curation_postgres_1
+    image: postgres:9.6
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backup:/backups
+    ports:
+      - "5432"
+    env_file: .env
+
+  curation-web:
+    image: curation_web_dev:latest
+    build:
+      context: ./curation-web/
+      dockerfile: ./Dockerfile
+    command: bash -c "npm run test && npm run build"
+    volumes:
+      - ./curation-web/static/:/app/static/
+    env_file: .env
+
+  app:
+    image: curation:latest
+    build:
+      context: .
+      dockerfile: ./curation-api/Dockerfile
+    user: django
+    env_file: .env
+    volumes:
+      - /usr/src/app/
+      - /usr/src/app/static
+    depends_on:
+      - postgres
+    command: /gunicorn.sh
+    ports:
+      - "80:8001"
+    links:
+      - postgres

@@ -1,0 +1,41 @@
+version: '2'
+
+volumes:
+  postgres_data: {}
+  postgres_backup: {}
+
+services:
+  postgres:
+    container_name: curation_postgres_travis_1
+    image: postgres:9.6
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backup:/backups
+    ports:
+      - "5432"
+    environment:
+      - POSTGRES_PASSWORD=mysecretpass
+      - POSTGRES_USER=curation
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=curation
+
+  curation-web:
+    image: curation_web:latest
+    build:
+      context: ./curation-web/
+      dockerfile: ./Dockerfile
+    command: bash -c "npm run build"
+    volumes:
+      - ./curation-web/static/:/app/static/
+    env_file: .env
+
+  app:
+    image: curation:latest
+    build:
+      context: .
+      dockerfile: ./curation-api/Dockerfile-travis
+    env_file: .env
+    depends_on:
+      - postgres
+    links:
+      - postgres

@@ -1,0 +1,4 @@
+from .test_appointment_view import TestAppointmentListView
+from .test_cohort_patient_view import TestCohortPatientsDetailView, TestCohortPatientsListView
+from .test_crf_question_view import TestCrfQuestion
+from .test_provider_view import ProviderViewTests, ProviderDetailsViewTests
